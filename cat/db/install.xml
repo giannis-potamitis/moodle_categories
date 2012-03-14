@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/cat/db" VERSION="20120211" COMMENT="XMLDB file for Moodle mod/mycat"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="cat" COMMENT="Default comment for the table, please edit me" NEXT="cat_category">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="assignmentid"/>
+        <FIELD NAME="assignmentid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="total"/>
+        <FIELD NAME="total" TYPE="number" LENGTH="15" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" DECIMALS="10" COMMENT="total of weights" PREVIOUS="assignmentid" NEXT="nextpriority"/>
+        <FIELD NAME="nextpriority" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false" PREVIOUS="total" NEXT="rankid"/>
+        <FIELD NAME="rankid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="nextpriority"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="f_assignmentid"/>
+        <KEY NAME="f_assignmentid" TYPE="unique" FIELDS="assignmentid" PREVIOUS="primary" NEXT="f_rankid"/>
+        <KEY NAME="f_rankid" TYPE="foreign" FIELDS="rankid" REFTABLE="cat_rank" REFFIELDS="id" PREVIOUS="f_assignmentid"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="cat_category" COMMENT="Default comment for the table, please edit me" PREVIOUS="cat" NEXT="cat_subcat">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="catid"/>
+        <FIELD NAME="catid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="description"/>
+        <FIELD NAME="description" TYPE="text" LENGTH="medium" NOTNULL="true" SEQUENCE="false" PREVIOUS="catid" NEXT="maxgrade"/>
+        <FIELD NAME="maxgrade" TYPE="number" LENGTH="15" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" DECIMALS="10" PREVIOUS="description" NEXT="weight"/>
+        <FIELD NAME="weight" TYPE="number" LENGTH="15" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" DECIMALS="10" PREVIOUS="maxgrade" NEXT="priority"/>
+        <FIELD NAME="priority" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false" PREVIOUS="weight" NEXT="nextsub"/>
+        <FIELD NAME="nextsub" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false" COMMENT="nextsub priority" PREVIOUS="priority"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="cat_subcat" COMMENT="Default comment for the table, please edit me" PREVIOUS="cat_category" NEXT="cat_submission">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="categoryid"/>
+        <FIELD NAME="categoryid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="description"/>
+        <FIELD NAME="description" TYPE="text" LENGTH="medium" NOTNULL="true" SEQUENCE="false" PREVIOUS="categoryid" NEXT="priority"/>
+        <FIELD NAME="priority" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false" PREVIOUS="description"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="cat_submission" COMMENT="Default comment for the table, please edit me" PREVIOUS="cat_subcat" NEXT="cat_subcat_submission">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="categoryid"/>
+        <FIELD NAME="categoryid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="ass_subid"/>
+        <FIELD NAME="ass_subid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="categoryid" NEXT="grade"/>
+        <FIELD NAME="grade" TYPE="number" LENGTH="15" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" DECIMALS="10" PREVIOUS="ass_subid" NEXT="feedback"/>
+        <FIELD NAME="feedback" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false" PREVIOUS="grade"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="f_categoryid"/>
+        <KEY NAME="f_categoryid" TYPE="foreign" FIELDS="categoryid" REFTABLE="cat_category" REFFIELDS="id" PREVIOUS="primary" NEXT="f_ass_subid"/>
+        <KEY NAME="f_ass_subid" TYPE="foreign" FIELDS="ass_subid" REFTABLE="assignment_submissions" REFFIELDS="id" PREVIOUS="f_categoryid"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="cat_subcat_submission" COMMENT="Default comment for the table, please edit me" PREVIOUS="cat_submission" NEXT="cat_rank">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="subcatid"/>
+        <FIELD NAME="subcatid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="ass_subid"/>
+        <FIELD NAME="ass_subid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="subcatid" NEXT="ranksid"/>
+        <FIELD NAME="ranksid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="ass_subid"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="f_subcatid"/>
+        <KEY NAME="f_subcatid" TYPE="foreign" FIELDS="subcatid" REFTABLE="cat_subcat" REFFIELDS="id" PREVIOUS="primary" NEXT="f_ass_subid"/>
+        <KEY NAME="f_ass_subid" TYPE="foreign" FIELDS="ass_subid" REFTABLE="assignment_submissions" REFFIELDS="id" PREVIOUS="f_subcatid" NEXT="f_ranksid"/>
+        <KEY NAME="f_ranksid" TYPE="foreign" FIELDS="ranksid" REFTABLE="cat_ranks" REFFIELDS="id" PREVIOUS="f_ass_subid"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="cat_rank" COMMENT="Default comment for the table, please edit me" PREVIOUS="cat_subcat_submission" NEXT="cat_ranks">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="name"/>
+        <FIELD NAME="name" TYPE="text" LENGTH="medium" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="nextpriority"/>
+        <FIELD NAME="nextpriority" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="name" NEXT="courseid"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="The course at which this set of ranks is defined. 0 if it is defined in the site level" PREVIOUS="nextpriority"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="f_courseid"/>
+        <KEY NAME="f_courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id" PREVIOUS="primary"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="cat_ranks" COMMENT="Default comment for the table, please edit me" PREVIOUS="cat_rank">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="rankid"/>
+        <FIELD NAME="rankid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="priority"/>
+        <FIELD NAME="priority" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="rankid" NEXT="description"/>
+        <FIELD NAME="description" TYPE="text" LENGTH="medium" NOTNULL="true" SEQUENCE="false" PREVIOUS="priority"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="f_rankid"/>
+        <KEY NAME="f_rankid" TYPE="foreign" FIELDS="rankid" REFTABLE="cat_rank" REFFIELDS="id" PREVIOUS="primary"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>
